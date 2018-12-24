@@ -9,7 +9,6 @@ import com.intellij.codeInsight.daemon.impl.HighlightRangeExtension
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.AnnotationSession
-import com.intellij.lang.annotation.Annotator
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -30,16 +29,19 @@ import org.rust.lang.core.psi.ext.*
 import org.rust.lang.core.resolve.Namespace
 import org.rust.lang.core.resolve.namespaces
 import org.rust.lang.core.types.inference
-import org.rust.lang.core.types.ty.*
+import org.rust.lang.core.types.ty.Ty
+import org.rust.lang.core.types.ty.TyTypeParameter
+import org.rust.lang.core.types.ty.TyUnit
+import org.rust.lang.core.types.ty.isSized
 import org.rust.lang.core.types.type
 import org.rust.lang.utils.RsDiagnostic
 import org.rust.lang.utils.RsErrorCode
 import org.rust.lang.utils.addToHolder
 
-class RsErrorAnnotator : Annotator, HighlightRangeExtension {
+class RsErrorAnnotator : RsAnnotatorBase(), HighlightRangeExtension {
     override fun isForceHighlightParents(file: PsiFile): Boolean = file is RsFile
 
-    override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+    override fun annotateInternal(element: PsiElement, holder: AnnotationHolder) {
         val visitor = object : RsVisitor() {
             override fun visitBaseType(o: RsBaseType) = checkBaseType(holder, o)
             override fun visitConstant(o: RsConstant) = checkConstant(holder, o)
